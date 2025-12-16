@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/static/images/icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+    <title>Pa Barya</title>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">Pa Barya</span>
+            </div>
+
+            <nav class="nav-links">
+                <a href="/"><strong>Home</strong></a>
+                <a href="/about"><strong>About</strong></a>
+            </nav>
+        </div>
+    </header>
+    <div class="machine">
+        <div class="machine-border">
+            <h1 class="title">Pa Barya</h1>
+            <p class="subtitle">Welcome to Pa Barya – your personal coin dispenser! Simply upload an image of your peso bill, and we’ll break it down into coins instantly. Choose your preferred coins and get ready for hassle-free change!</p>
+
+            <!-- Upload -->
+            <div id="uploadSection" class="panel upload-panel">
+                <label class="upload-label">
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+
+                    <p class="upload-main">INSERT BILL</p>
+                    <p class="upload-sub">Tap to upload image</p>
+                </label>
+            </div>
+
+            <!-- Preview -->
+            <div id="previewSection" class="panel hidden">
+            <img id="billImage" alt="Upload Bill preview">
+            <div id="detectBox" class="detect-box">SCANNING...</div>
+            </div>
+
+            <div id="coinSelection" class="panel">
+                <p class="question">
+                    SELECT COINS
+                </p>
+
+                <div class="coins">
+                    <button class="coin" data-value="10">₱10</button>
+                    <button class="coin" data-value="5">₱5</button>
+                    <button class="coin" data-value="1">₱1</button>
+                </div>
+            </div>
+
+            <button id="detectBtn" disabled class="action-btn">DISPENSE COINS</button>
+
+            <div class="preview" id="preview"></div>
+            <div class="loading" id="loading" style="display:none;">Loading...</div>
+            <div class="results" id="results" style="display:none;"></div>
+
+            <button id="resetBtn" class="reset-btn hidden" style="display:none;">
+                NEW TRANSACTION
+            </button>
+        </div>
+    </div>
+</body>
+</html>
