@@ -2,8 +2,10 @@ from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import requests
-import base64
+
+from gradio_client import Client, handle_file
+import tempfile
+import os
 
 app = FastAPI()
 
@@ -14,9 +16,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # --------------------
-# Hugging Face Space
+# Hugging Face Space Client
 # --------------------
-HF_API_URL = "https://YOUR-USERNAME-YOUR-SPACE.hf.space/run/predict"
+HF_SPACE = "jayn95/Pa-Barya"
+hf_client = Client(HF_SPACE)
 
 # --------------------
 # Pages
@@ -30,21 +33,32 @@ def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request})
 
 # --------------------
-# API Proxy
+# API Proxy (Gradio-style)
 # --------------------
 @app.post("/detect")
 async def detect(file: UploadFile = File(...), coins: str = Form("")):
-    image_bytes = await file.read()
+    # Save uploaded image temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
+        image_bytes = await file.read()
+        tmp.write(image_bytes)
+        tmp_path = tmp.name
 
-    encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+    try:
+        result = hf_client.predict(
+            image=handle_file(tmp_path),
+            coins=coins,
+            api_name="/gradio_detect"
+        )
 
-    payload = {
-        "data": [
-            encoded_image,
-            coins
-        ]
-    }
+        return JSONResponse(content=result)
 
-    response = requests.post(HF_API_URL, json=payload, timeout=60)
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
-    return JSONResponse(content=response.json())
+    finally:
+        # Clean up temp file
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
