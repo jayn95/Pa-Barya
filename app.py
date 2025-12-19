@@ -62,3 +62,7 @@ async def detect(file: UploadFile = File(...), coins: str = Form("")):
         # Clean up temp file
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
