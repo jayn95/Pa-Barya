@@ -15,7 +15,7 @@ const coinButtons = document.querySelectorAll('.coin');
 const resetBtn = document.getElementById("resetBtn");
 
 let selectedFile = null;
-let selectedCoins = new Set();
+let selectedCoins = null;
 
 /* -----------------------------
    IMAGE UPLOAD + PREVIEW
@@ -47,13 +47,12 @@ coinButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         const value = btn.dataset.value;
 
-        if (selectedCoins.has(value)) {
-            selectedCoins.delete(value);
-            btn.classList.remove('active');
-        } else {
-            selectedCoins.add(value);
-            btn.classList.add('active');
-        }
+        // Remove active state from all coins
+        coinButtons.forEach(b => b.classList.remove('active', 'selected'));
+
+        // Set the clicked coin as active
+        btn.classList.add('active', 'selected');
+        selectedCoin = value;
     });
 });
 
@@ -61,6 +60,14 @@ coinButtons.forEach(btn => {
    DETECT & DISPENSE
 -------------------------------- */
 detectBtn.addEventListener('click', async () => {
+
+    // Ensure a coin is selected before detection
+    if (!selectedCoin) {
+        alert("Please select a coin denomination.");
+        detectBtn.disabled = false;
+        return;
+    }
+
     if (!selectedFile) return;
 
     detectBox.style.display = "block";
@@ -73,8 +80,8 @@ detectBtn.addEventListener('click', async () => {
     const formData = new FormData();
     formData.append('file', selectedFile);
 
-    if (selectedCoins.size > 0) {
-        formData.append('coins', Array.from(selectedCoins).join(','));
+    if (selectedCoin) {
+        formData.append('coins', selectedCoin);
     }
 
     try {
